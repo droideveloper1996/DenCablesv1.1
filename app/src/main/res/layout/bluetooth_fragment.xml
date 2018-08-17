@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/btnSearch"
+        android:layout_marginTop="100dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="@string/bluetooth_btnSearch" >
+    </Button>
+
+    <EditText
+        android:id="@+id/txt_content"
+        android:layout_width="match_parent"
+        android:layout_height="135dp"
+        android:ems="10"
+        android:padding="2dp"
+        android:gravity="center_vertical|top"
+        android:background="@color/white"
+        android:layout_marginTop="2dp"
+        android:text="@string/bluetooth_txt_content"
+        android:textSize="16sp" >
+    </EditText>
+
+    <Button
+        android:id="@+id/btnSend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="@string/bluetooth_btnSend" >
+    </Button>
+    
+    <Button
+        android:id="@+id/qr_code_Send"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="@string/bluetooth_qr_code_Send" >
+    </Button>
+
+    <Button
+        android:id="@+id/btn_test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="@string/bluetooth_btn_test" >
+    </Button>
+
+    <Button
+        android:id="@+id/btnClose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="@string/bluetooth_btnClose" >
+    </Button>
+
+</LinearLayout>

@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">DenCables</string>
+    <string name="True">true</string>
+    <string name="False">false</string>
+
+
+    <!-- USB资源 -->
+    <string name="usb_header_text">Usb</string>
+    <string name="usb_btn_conn">Connect USB Printer</string>
+    <string name="usb_btnSend">Print</string>
+    <string name="usb_qr_code_Send">2D Barcode Print</string>
+    <string name="usb_btn_test">Print Test Page</string>
+    <string name="usb_btnClose">Close</string>
+    <string name="usb_txt_content">&quot;&quot;</string>
+    <string name="usb_hoin_enterprise_vision"></string>
+    <string name="usb_menu_settings">set</string>
+    <string name="usb_strLang">en</string>
+    <string name="usb_msg_getpermission">obtaining USB device access permissions success</string>
+    <string name="usb_msg_conn_state">USB device can not access, please re-connect</string>
+    <string name="usb_qr_code_Send_string">SDK 2D-Code print test.</string>
+
+    <!-- BlueTooth资源 -->
+    <string name="bluetooth_header_text">BlueTooth</string>
+    <string name="bluetooth_none_paired">No devices have been paired</string>
+    <string name="bluetooth_scanning">scanning for devices...</string>
+    <string name="bluetooth_select_device">select a device to connect</string>
+    <string name="bluetooth_none_found">No devices found</string>
+    <string name="bluetooth_btnSearch">Connect  Bluetooth  Printer</string>
+    <string name="bluetooth_btnSend">Print</string>
+    <string name="bluetooth_qr_code_Send">2D Barcode Print</string>
+    <string name="bluetooth_btn_test">Print Test Page</string>
+    <string name="bluetooth_btnClose">Close</string>
+    <string name="bluetooth_txt_content"></string>
+    <string name="bluetooth_menu_settings">set</string>
+    <string name="bluetooth_strLang">en</string>
+    <string name="bluetooth_button_scan">Scan for devices</string>
+    <string name="bluetooth_qr_code_Send_string">SDK 2D-Code print test.</string>
+
+    <!-- WIFI资源 -->
+    <string name="wifi_header_text">Wifi</string>
+    <string name="wifi_btnConn">Connect WIFI Printer</string>
+    <string name="wifi_btnPrint">Print</string>
+    <string name="wifi_qr_code_Send">2D Barcode Print</string>
+    <string name="wifi_btn_test">Print  Test  Page</string>
+    <string name="wifi_btnClose">Close</string>
+    <string name="wifi_txt_content">&quot;&quot;</string>
+    <string name="wifi_strLang">en</string>
+    <string name="wifi_lblAddressIp">IP-Address:</string>
+    <string name="wifi_btn_opencasher">Open Casher</string>
+    <string name="wifi_qr_code_Send_string">SDK 2D-Code print test.</string>
+</resources>

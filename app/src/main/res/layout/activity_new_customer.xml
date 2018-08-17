@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f1f1f1"
+    android:orientation="vertical"
+    tools:context=".NewCustomerActivity">
+
+    <include
+        android:id="@+id/toolbar1"
+        layout="@layout/toolbar" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:alpha="0.99"
+        android:src="@drawable/customers" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:fontFamily="sans-serif-condensed"
+        android:text="Customer Details"
+        android:textColor="#252525"
+        android:textSize="20dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/customerFirstName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/edittext_stye"
+            android:fontFamily="sans-serif-condensed"
+            android:hint="First Name"
+            android:padding="8dp" />
+
+        <EditText
+            android:id="@+id/customerLastName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/edittext_stye"
+            android:fontFamily="sans-serif-condensed"
+            android:hint="Last Name"
+            android:padding="8dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/Address1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/edittext_stye"
+            android:fontFamily="sans-serif-condensed"
+            android:hint="Address Line1"
+            android:padding="8dp" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/Address2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/edittext_stye"
+            android:fontFamily="sans-serif-condensed"
+            android:hint="Address Line2"
+            android:padding="8dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/pincode"
+            android:maxLength="6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="number"
+            android:background="@drawable/edittext_stye"
+            android:fontFamily="sans-serif-condensed"
+            android:hint="Pincode"
+            android:padding="8dp" />
+
+        <EditText
+            android:id="@+id/boxNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/edittext_stye"
+            android:fontFamily="sans-serif-condensed"
+            android:hint="Box Number"
+            android:padding="8dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/vcNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/edittext_stye"
+            android:fontFamily="sans-serif-condensed"
+            android:hint="VC Number"
+            android:padding="8dp" />
+
+        <EditText
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/edittext_stye"
+            android:fontFamily="sans-serif-condensed"
+            android:hint="Activation Date"
+            android:padding="8dp" />
+
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/mobile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:inputType="number"
+        android:layout_marginBottom="8dp"
+        android:maxLength="10"
+        android:background="@drawable/edittext_stye"
+        android:fontFamily="sans-serif-condensed"
+        android:hint="Mobile Number"
+        android:padding="8dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/circularbtn"
+        android:text="Submit"
+        android:id="@+id/submitBtn"
+        android:textColor="#fff" />
+</LinearLayout>

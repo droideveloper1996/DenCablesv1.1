@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "415190058374",
+    "firebase_url": "https://dencables.firebaseio.com",
+    "project_id": "dencables",
+    "storage_bucket": "dencables.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:415190058374:android:e89202796cbab570",
+        "android_client_info": {
+          "package_name": "com.capiyoo.dencables"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "415190058374-1diefq788lpvs5b96lgn5ttlec48rnh8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.capiyoo.dencables",
+            "certificate_hash": "5ea7e15bb04ec3afd458bd83ff64d4feb82576a7"
+          }
+        },
+        {
+          "client_id": "415190058374-nmft1bui4bspj2fe1h7267q5p9js935p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMOfzh6RRKRsf5WBbhFMZHMCkekrCDktc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "415190058374-nmft1bui4bspj2fe1h7267q5p9js935p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
