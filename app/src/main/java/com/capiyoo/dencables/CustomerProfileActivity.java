@@ -4,11 +4,11 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -21,10 +21,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -40,7 +38,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 public class CustomerProfileActivity extends AppCompatActivity {
     BluetoothService mService = null;
@@ -52,7 +49,7 @@ public class CustomerProfileActivity extends AppCompatActivity {
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
     View toolbarView;
-
+    Button connectPrinter;
     TextView customerNameData;
     TextView customerAddress;
     TextView customerMobile;
@@ -76,12 +73,67 @@ public class CustomerProfileActivity extends AppCompatActivity {
     String key;
     String customerLastPayDate;
     Button printReciept;
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case BluetoothService.MESSAGE_STATE_CHANGE:
+                    switch (msg.arg1) {
+                        case BluetoothService.STATE_CONNECTED:   //ÒÑÁ¬½Ó
+                            connectPrinter.setVisibility(View.GONE);
+                            Toast.makeText(CustomerProfileActivity.this, "Connect successful",
+                                    Toast.LENGTH_SHORT).show();
+                            //  btnClose.setEnabled(true);
+                            // btnSend.setEnabled(true);
+                            // qrCodeBtnSend.setEnabled(true);
+                            //  btnSendDraw.setEnabled(true);
+                            break;
+                        case BluetoothService.STATE_CONNECTING:  //ÕýÔÚÁ¬½Ó
+                            Log.d("À¶ÑÀµ÷ÊÔ", "ÕýÔÚÁ¬½Ó.....");
+                            break;
+                        case BluetoothService.STATE_LISTEN:     //¼àÌýÁ¬½ÓµÄµ½À´
+                        case BluetoothService.STATE_NONE:
+                            Log.d("À¶ÑÀµ÷ÊÔ", "µÈ´ýÁ¬½Ó.....");
+                            break;
+                    }
+                    break;
+                case BluetoothService.MESSAGE_CONNECTION_LOST:    //À¶ÑÀÒÑ¶Ï¿ªÁ¬½Ó
+                    Toast.makeText(CustomerProfileActivity.this, "Device connection was lost",
+                            Toast.LENGTH_SHORT).show();
+                    connectPrinter.setVisibility(View.VISIBLE);
+                    // btnClose.setEnabled(false);
+                    //   btnSend.setEnabled(false);
+                    //   qrCodeBtnSend.setEnabled(false);
+                    //   btnSendDraw.setEnabled(false);
+                    break;
+                case BluetoothService.MESSAGE_UNABLE_CONNECT:     //ÎÞ·¨Á¬½ÓÉè±¸
+                    Toast.makeText(CustomerProfileActivity.this, "Unable to connect device",
+                            Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+
+    };
+    DenDetails denDetails;
+
+
+    public static void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = activity.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_profile);
         firebaseAuth = FirebaseAuth.getInstance();
+        connectPrinter = findViewById(R.id.actionConnectPrinter);
         printReciept=findViewById(R.id.actionPrintReciept);
         SharedPref sharedPref = new SharedPref(this);
         databaseReference = FirebaseDatabase.getInstance().getReference().child(Constants.CUSTOMER_DATA).child(sharedPref.getFirebaseUid());
@@ -127,7 +179,7 @@ public class CustomerProfileActivity extends AppCompatActivity {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot != null) {
                             //  Toast.makeText(getApplicationContext(), dataSnapshot.toString(), Toast.LENGTH_LONG).show();
-                            DenDetails denDetails = dataSnapshot.getValue(DenDetails.class);
+                            denDetails = dataSnapshot.getValue(DenDetails.class);
 
                             try {
                                 customerNameData.setText(denDetails.getmCustomerName());
@@ -174,133 +226,163 @@ public class CustomerProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 updateBalance();
-                printReciept.setVisibility(View.VISIBLE);
+                //  printReciept.setVisibility(View.VISIBLE);
             }
         });
 
+
+        //connect printer button
+        connectPrinter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                connectPrinter();
+
+            }
+        });
+
+        //Button for printing Reciept;
         printReciept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                String lang = getString(R.string.bluetooth_strLang);
-                SharedPref sharedPref=new SharedPref(CustomerProfileActivity.this);
-                byte[] cmd = new byte[3];
-                cmd[0] = 0x1b;
-                cmd[1] = 0x21;
-                if ((lang.compareTo("en")) == 0) {
-                    cmd[2] |= 0x10;
-                    mService.write(cmd);
-                    mService.sendMessage(formatString(sharedPref.getFirmName()), "GBK");
-                    cmd[2] &= 0xEF;
-                    mService.write(cmd);
-                    mService.sendMessage(formatString(sharedPref.getFirmAddress1() + " " + sharedPref.getFirmAddress2() + " " + sharedPref.getCity()
-                            ) + '\n' + arrangeEndToEnd("Contact No.", sharedPref.getFirmContact()) + '\n' +
-                                    arrangeEndToEnd("Person", sharedPref.getFirmAuthority())
-                            , "GBK");
+                try {
+                    String lang = getString(R.string.bluetooth_strLang);
+                    SharedPref sharedPref = new SharedPref(CustomerProfileActivity.this);
+                    byte[] cmd = new byte[3];
+                    cmd[0] = 0x1b;
+                    cmd[1] = 0x21;
+                    if ((lang.compareTo("en")) == 0) {
+                        cmd[2] |= 0x10;
+                        mService.write(cmd);
+                        mService.sendMessage(formatString(sharedPref.getFirmName()), "GBK");
+                        cmd[2] &= 0xEF;
+                        mService.write(cmd);
+                        mService.sendMessage(formatString(sharedPref.getFirmAddress1() + " " + sharedPref.getFirmAddress2() + " " + sharedPref.getCity()
+                                ) + '\n' + arrangeEndToEnd("Contact No.", sharedPref.getFirmContact()) + '\n' +
+                                        arrangeEndToEnd("Person", sharedPref.getFirmAuthority() + '\n')
+                                , "GBK");
 
-                    cmd[2] &= 0xEF;
-                    mService.write(cmd);
-                    //   mService.sendMessage(), "GBK");
+                        cmd[2] |= 0x10;
+                        mService.write(cmd);
+                        mService.sendMessage(formatString("Invoice") + '\n', "GBK");
 
-                    /**
-                     * Bill Format
-                     *
-                     * 			CapiYoo Infotech Pvt Ltd.
-                     115/8 AwasVikas Sector -J
-                     Keshavpuram Kalyanpur Kanpur
-                     Uttar Pradesh
+                        cmd[2] &= 0xEF;
+                        mService.write(cmd);
+                        mService.sendMessage(arrangeEndToEnd("INVOICE NO.", "ANM-000001"), "GBK");
 
-                     Invoice
-                     Crew: XXXX					Id:XXXX
-                     ----------------------------------------------------------
-                     *
-                     *
-                     *
-                     *
-                     *
-                     *
-                     *
-                     *
-                     *
-                     *
-                     *
-                     *
-                     *
-                     *
-                     *
-                     */
-                    String msg =
-                            " 115/8 AwasVikas Sector -J \n"
-                                    + "  Keshavpuram Kalyanpur Kanpur\n"
-                                    + "     Uttar Pradesh\n\n"
-                                    + "GSTIN-            ABCDEFG123456\n\n"
-                                    + "         INVOICE\n\n"
-                                    + " Crew: XXXX          Id:XXXX \n"
-                                    + "--------------------------------"
-                                    + "BillNO:		 234XXXXXX\n"
-                                    + "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456 ";
-                    //   mService.sendMessage(msg, "GBK");
-                }
-            }
-        });
-    }
+                        cmd[2] &= 0xEF;
+                        mService.write(cmd);
+                        mService.sendMessage(arrangeEndToEnd("Customer Name", denDetails.getmCustomerName()), "GBK");
+
+                        cmd[2] &= 0xEF;
+                        mService.write(cmd);
+                        mService.sendMessage(arrangeEndToEnd("Customer Address", denDetails.getmCustomerAddress()), "GBK");
+
+                        cmd[2] &= 0xEF;
+                        mService.write(cmd);
+                        mService.sendMessage(arrangeEndToEnd("Box Number", denDetails.getmSetupBoxNumber()), "GBK");
+
+                        cmd[2] &= 0xEF;
+                        mService.write(cmd);
+                        mService.sendMessage(arrangeEndToEnd("Card Number", denDetails.getmVCNo()), "GBK");
+
+                        cmd[2] &= 0xEF;
+                        mService.write(cmd);
+                        mService.sendMessage(arrangeEndToEnd("Previous Balance.", denDetails.getmBalance()), "GBK");
+
+                        cmd[2] &= 0xEF;
+                        mService.write(cmd);
+                        mService.sendMessage(arrangeEndToEnd("Monthly Charge", denDetails.getmMonthlyCharge()), "GBK");
+
+                        cmd[2] &= 0xEF;
+                        mService.write(cmd);
+                        mService.sendMessage(formatString("\n"), "GBK");
+
+                        cmd[2] |= 0x10;
+                        mService.write(cmd);
+                        mService.sendMessage(formatString("--------------------------------") + '\n', "GBK");
+
+                        cmd[2] |= 0x10;
+                        mService.write(cmd);
+                        mService.sendMessage(arrangeEndToEnd("Total Amount", Float.toString(outstandingAmt)), "GBK");
 
 
-    public static void hideKeyboard(Activity activity) {
-        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        //Find the currently focused view, so we can grab the correct window token from it.
-        View view = activity.getCurrentFocus();
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
-        if (view == null) {
-            view = new View(activity);
-        }
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
+                        cmd[2] |= 0x10;
+                        mService.write(cmd);
+                        mService.sendMessage(arrangeEndToEnd("Paid Amount", Float.toString(paidAmount)), "GBK");
 
-    void updateBalance() {
+                        cmd[2] |= 0x10;
+                        mService.write(cmd);
+                        mService.sendMessage(arrangeEndToEnd("Remaining Balance", Float.toString(outstandingAmount)), "GBK");
 
-        if (!TextUtils.isEmpty(paynow.getText().toString())) {
-            actionPrintReport.setVisibility(View.GONE);
-            paynow.setVisibility(View.GONE);
-            printReciept.setVisibility(View.VISIBLE);
-            paidAmount = Float.parseFloat(paynow.getText().toString());
-            outstandingAmount = outstandingAmt - paidAmount;
-            if (outstandingAmount < 0) {
-                outstandingAmount *= -1;
-            }
-            Date c = Calendar.getInstance().getTime();
-            System.out.println("Current time => " + c);
+                        cmd[2] |= 0x10;
+                        mService.write(cmd);
+                        mService.sendMessage(formatString("--------------------------------") + '\n', "GBK");
 
-            SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
-            String formattedDate = df.format(c);
-            Toast.makeText(getApplicationContext(), Float.toString(outstandingAmount) + "     " + formattedDate, Toast.LENGTH_LONG).show();
-            DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference().child(Constants.CUSTOMER_DATA).child(new SharedPref(CustomerProfileActivity.this).getFirebaseUid());
-            databaseReference1.keepSynced(true);
-            Map map = new HashMap<>();
-            map.put("mRecAmount", paynow.getText().toString());
-            map.put("mRecDate", formattedDate);
-            map.put("mRecNo", "R-2049392");
-            map.put("mBalance", Float.toString(outstandingAmount));
 
-            databaseReference1.child(key).updateChildren(map).addOnCompleteListener(new OnCompleteListener() {
-                @Override
-                public void onComplete(@NonNull Task task) {
-                    if (task.isSuccessful()) {
-                        connectPrinter();
-                        Toast.makeText(getApplicationContext(), "Balance Updated", Toast.LENGTH_LONG).show();
+                        cmd[2] |= 0x10;
+                        mService.write(cmd);
+                        mService.sendMessage('\n' + formatString("Thank You For Choosing Den"), "GBK");
+
+                        cmd[2] &= 0xEF;
+                        mService.write(cmd);
+                        mService.sendMessage(formatString("Have a great Day ahead :)\n\n"), "GBK");
+
+                        cmd[2] &= 0xEF;
+                        mService.write(cmd);
+                        mService.sendMessage(formatString("CapiYoo Infotech Pvt Ltd."), "GBK");
+                        cmd[2] &= 0xEF;
+                        mService.write(cmd);
+                        mService.sendMessage(formatString("droid.developer1996@gmail.com\n\n\n\n\n"), "GBK");
+
+
+                        //   mService.sendMessage(), "GBK");
+
+                        /**
+                         * Bill Format
+                         *
+                         * 			CapiYoo Infotech Pvt Ltd.
+                         115/8 AwasVikas Sector -J
+                         Keshavpuram Kalyanpur Kanpur
+                         Uttar Pradesh
+
+                         Invoice
+                         Crew: XXXX					Id:XXXX
+                         ----------------------------------------------------------
+                         *
+                         *
+                         *
+                         *
+                         *
+                         *
+                         *
+                         *
+                         *
+                         *
+                         *
+                         *
+                         *
+                         *
+                         *
+                         */
+                        String msg =
+                                " 115/8 AwasVikas Sector -J \n"
+                                        + "  Keshavpuram Kalyanpur Kanpur\n"
+                                        + "     Uttar Pradesh\n\n"
+                                        + "GSTIN-            ABCDEFG123456\n\n"
+                                        + "         INVOICE\n\n"
+                                        + " Crew: XXXX          Id:XXXX \n"
+                                        + "--------------------------------"
+                                        + "BillNO:		 234XXXXXX\n"
+                                        + "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456 ";
+                        //   mService.sendMessage(msg, "GBK");
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            });
-        } else {
-            Toast.makeText(getApplicationContext(), "Invalid Amount", Toast.LENGTH_LONG).show();
-        }
+            }
 
-        actionPrintReport.setEnabled(false);
+        });
     }
 
 
@@ -331,6 +413,63 @@ public class CustomerProfileActivity extends AppCompatActivity {
         }
     }
 
+    void updateBalance() {
+
+        if (!TextUtils.isEmpty(paynow.getText().toString())) {
+            //  actionPrintReport.setVisibility(View.GONE);
+            paynow.setVisibility(View.GONE);
+            //printReciept.setVisibility(View.VISIBLE);
+            paidAmount = Float.parseFloat(paynow.getText().toString());
+            outstandingAmount = outstandingAmt - paidAmount;
+            if (outstandingAmount < 0) {
+                outstandingAmount *= -1;
+            }
+            Date c = Calendar.getInstance().getTime();
+            System.out.println("Current time => " + c);
+
+            SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+            String formattedDate = df.format(c);
+            Toast.makeText(getApplicationContext(), Float.toString(outstandingAmount) + "     " + formattedDate, Toast.LENGTH_LONG).show();
+            DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference().child(Constants.CUSTOMER_DATA).child(new SharedPref(CustomerProfileActivity.this).getFirebaseUid());
+            databaseReference1.keepSynced(true);
+            Map map = new HashMap<>();
+            map.put("mRecAmount", paynow.getText().toString());
+            map.put("mRecDate", formattedDate);
+            map.put("mRecNo", "R-2049392");
+            map.put("mBalance", Float.toString(outstandingAmount));
+
+            databaseReference1.child(key).updateChildren(map).addOnCompleteListener(new OnCompleteListener() {
+                @Override
+                public void onComplete(@NonNull Task task) {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(getApplicationContext(), "Balance Updated", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+
+            //Hide my Pay now button
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    actionPrintReport.setVisibility(View.GONE);
+                    printReciept.setVisibility(View.VISIBLE);
+                    connectPrinter.setVisibility(View.VISIBLE);
+                }
+            }, 500);
+
+        } else {
+            Toast.makeText(getApplicationContext(), "Invalid Amount", Toast.LENGTH_LONG).show();
+        }
+
+        actionPrintReport.setEnabled(false);
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -338,46 +477,6 @@ public class CustomerProfileActivity extends AppCompatActivity {
             mService.stop();
         mService = null;
     }
-
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case BluetoothService.MESSAGE_STATE_CHANGE:
-                    switch (msg.arg1) {
-                        case BluetoothService.STATE_CONNECTED:   //ÒÑÁ¬½Ó
-                            Toast.makeText(CustomerProfileActivity.this, "Connect successful",
-                                    Toast.LENGTH_SHORT).show();
-                          //  btnClose.setEnabled(true);
-                           // btnSend.setEnabled(true);
-                           // qrCodeBtnSend.setEnabled(true);
-                          //  btnSendDraw.setEnabled(true);
-                            break;
-                        case BluetoothService.STATE_CONNECTING:  //ÕýÔÚÁ¬½Ó
-                            Log.d("À¶ÑÀµ÷ÊÔ", "ÕýÔÚÁ¬½Ó.....");
-                            break;
-                        case BluetoothService.STATE_LISTEN:     //¼àÌýÁ¬½ÓµÄµ½À´
-                        case BluetoothService.STATE_NONE:
-                            Log.d("À¶ÑÀµ÷ÊÔ", "µÈ´ýÁ¬½Ó.....");
-                            break;
-                    }
-                    break;
-                case BluetoothService.MESSAGE_CONNECTION_LOST:    //À¶ÑÀÒÑ¶Ï¿ªÁ¬½Ó
-                    Toast.makeText(CustomerProfileActivity.this, "Device connection was lost",
-                            Toast.LENGTH_SHORT).show();
-                   // btnClose.setEnabled(false);
-                 //   btnSend.setEnabled(false);
-                 //   qrCodeBtnSend.setEnabled(false);
-                 //   btnSendDraw.setEnabled(false);
-                    break;
-                case BluetoothService.MESSAGE_UNABLE_CONNECT:     //ÎÞ·¨Á¬½ÓÉè±¸
-                    Toast.makeText(CustomerProfileActivity.this, "Unable to connect device",
-                            Toast.LENGTH_SHORT).show();
-                    break;
-            }
-        }
-
-    };
 
 
 

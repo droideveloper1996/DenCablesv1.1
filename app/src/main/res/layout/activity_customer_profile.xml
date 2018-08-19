@@ -257,6 +257,20 @@
                         android:text="Pay Now"
                         android:textColor="#fff"
                         android:textSize="12sp" />
+
+                    <Button
+                        android:id="@+id/actionConnectPrinter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_margin="8dp"
+                        android:background="@drawable/circularbtn"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
+                        android:text="Connect Printer"
+                        android:textColor="#fff"
+                        android:textSize="12sp"
+                        android:visibility="gone" />
                     <Button
                         android:id="@+id/actionPrintReciept"
                         android:layout_width="wrap_content"
@@ -264,11 +278,10 @@
                         android:layout_margin="8dp"
                         android:background="@drawable/circularbtn"
                         android:paddingLeft="20dp"
-                        android:gravity="center_horizontal"
                         android:visibility="gone"
                         android:layout_gravity="center_horizontal"
                         android:paddingRight="20dp"
-                        android:text="Print Reciept"
+                        android:text="Print Invoice"
                         android:textColor="#fff"
                         android:textSize="12sp" />
 
