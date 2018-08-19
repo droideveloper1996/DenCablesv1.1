@@ -122,7 +122,7 @@ public class SignupActivity extends AppCompatActivity {
                     Timestamp tsTemp = new Timestamp(time);
                     String ts = tsTemp.toString();
 
-                    OperatorProfile operatorProfile = new OperatorProfile();
+                    final OperatorProfile operatorProfile = new OperatorProfile();
                     operatorProfile.setmAddress1(mAddress1);
                     operatorProfile.setmAddress2(mAddress2);
                     operatorProfile.setmCity(mCity);
@@ -143,6 +143,15 @@ public class SignupActivity extends AppCompatActivity {
                                 if (firebaseAuth.getCurrentUser() != null) {
                                     String uid = firebaseAuth.getCurrentUser().getUid();
                                     sharedPref.putMyUid(uid);
+
+                                    sharedPref.setFirmName(operatorProfile.getmCompanyName());
+                                    sharedPref.setFirmContact(operatorProfile.getmMobile());
+                                    sharedPref.setFirmAuthority(operatorProfile.getmPersonName());
+                                    sharedPref.putFirmAddress1(operatorProfile.getmAddress1());
+                                    sharedPref.putFirmAddress2(operatorProfile.getmAddress2());
+                                    sharedPref.setState(operatorProfile.getmState());
+                                    sharedPref.setCity(operatorProfile.getmState());
+
                                 } else {
                                     sharedPref.putMyUid("null");
                                 }

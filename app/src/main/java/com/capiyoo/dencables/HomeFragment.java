@@ -40,6 +40,7 @@ public class HomeFragment extends Fragment implements SearchView.OnQueryTextList
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.home_fragment, container, false);
         denDetailsArrayList = new ArrayList<>();
+
         denCustomerKey = new ArrayList<>();
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
@@ -48,10 +49,12 @@ public class HomeFragment extends Fragment implements SearchView.OnQueryTextList
         firebaseDatabase = FirebaseDatabase.getInstance();
         progressBar = view.findViewById(R.id.progressBar);
 
+
         String uid = new SharedPref(getContext()).getFirebaseUid();
         if (uid != null) {
             customerDatabasereference = firebaseDatabase.getReference().child(Constants.CUSTOMER_DATA).child(uid);
-        } else {
+            customerDatabasereference.keepSynced(true);
+           } else {
             Toast.makeText(getContext(), "Authentication Error", Toast.LENGTH_LONG).show();
         }
         getCustomerData();
@@ -101,6 +104,7 @@ public class HomeFragment extends Fragment implements SearchView.OnQueryTextList
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot != null) {
                     denDetailsArrayList.clear();
+                    denCustomerKey.clear();
                     for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
                         denCustomerKey.add(childDataSnapshot.getKey());
                         DenDetails denDetails = childDataSnapshot.getValue(DenDetails.class);

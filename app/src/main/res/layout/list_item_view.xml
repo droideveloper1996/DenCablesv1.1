@@ -11,7 +11,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginTop="4dp"
-        android:src="@drawable/avatar"
+        android:src="@drawable/joao"
         app:civ_border_color="#f3e1dbdb"
         app:civ_border_width="3dp" />
 

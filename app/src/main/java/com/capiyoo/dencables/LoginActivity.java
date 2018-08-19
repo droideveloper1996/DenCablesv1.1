@@ -1,5 +1,6 @@
 package com.capiyoo.dencables;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,7 +20,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -29,13 +35,19 @@ public class LoginActivity extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
     FirebaseDatabase firebaseDatabase;
     FirebaseAuth.AuthStateListener authStateListener;
+    DatabaseReference firebaseDatabaseRef;
     Button loginBtn;
     private TextView mSignup;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        progressDialog=new ProgressDialog(this);
+        progressDialog.setTitle("Logging in");
+        progressDialog.setMessage("Please wait...");
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        firebaseDatabaseRef = FirebaseDatabase.getInstance().getReference().child(Constants.USER_REGISTRATION);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_login);
@@ -75,6 +87,7 @@ public class LoginActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(user) || TextUtils.isEmpty(passwd)) {
             Toast.makeText(getApplicationContext(), "Fields Empty", Toast.LENGTH_LONG).show();
         } else {
+            progressDialog.show();
             firebaseAuth.signInWithEmailAndPassword(user, passwd).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
@@ -83,6 +96,30 @@ public class LoginActivity extends AppCompatActivity {
                         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
                         if (firebaseAuth.getCurrentUser() != null) {
                             sharedPref.putMyUid(firebaseAuth.getCurrentUser().getUid());
+                            firebaseDatabaseRef.child(firebaseAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot != null) {
+                                        OperatorProfile operatorProfile = dataSnapshot.getValue(OperatorProfile.class);
+                                        SharedPref sharedPref = new SharedPref(LoginActivity.this);
+                                        sharedPref.setFirmName(operatorProfile.getmCompanyName());
+                                        sharedPref.setFirmContact(operatorProfile.getmMobile());
+                                        sharedPref.setFirmAuthority(operatorProfile.getmPersonName());
+                                        sharedPref.putFirmAddress1(operatorProfile.getmAddress1());
+                                        sharedPref.putFirmAddress2(operatorProfile.getmAddress2());
+                                        sharedPref.setState(operatorProfile.getmState());
+                                        sharedPref.setCity(operatorProfile.getmState());
+
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+
                         } else {
                             sharedPref.putMyUid("null");
                         }

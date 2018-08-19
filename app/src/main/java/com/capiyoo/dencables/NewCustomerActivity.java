@@ -59,6 +59,7 @@ public class NewCustomerActivity extends AppCompatActivity {
         String uid = sharedPref.getFirebaseUid();
         if (uid != null) {
             customerDatabaseRefrence = FirebaseDatabase.getInstance().getReference().child(Constants.CUSTOMER_DATA).child(uid);
+            customerDatabaseRefrence.keepSynced(true);
         }
         submitBtn.setOnClickListener(new View.OnClickListener() {
             @Override

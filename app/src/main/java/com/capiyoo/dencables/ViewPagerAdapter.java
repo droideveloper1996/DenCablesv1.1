@@ -19,7 +19,7 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
             case 0:
                 return new HomeFragment();
             case 1:
-                return new MyAccount();
+                return new BillingFragment();
             case 2:
                 return new PendingDetail();
             case 3:
@@ -40,13 +40,13 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
-                return "CUSTOMERS";
+                return "Customers";
             case 1:
-                return "BILLING";
+                return "Billing";
             case 2:
-                return "PENDING";
+                return "Pending";
             case 3:
-                return "NOTIFICATION";
+                return "Report";
 
         }
         return null;

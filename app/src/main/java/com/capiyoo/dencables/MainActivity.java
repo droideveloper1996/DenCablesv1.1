@@ -57,9 +57,12 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Intent intent = getIntent();
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference().child(Constants.USER_REGISTRATION);
+//        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
         getAuthState();
         if (intent != null && intent.hasExtra(Constants.IS_ACCOUNT_ACTIVATED) && intent.hasExtra(Constants.FIRST_TIME_REGISTRATION)) {
 
@@ -109,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                                  *  Check weather the account is active or not;
                                  *  account inactive
                                  */
-                                Toast.makeText(getApplicationContext(), Boolean.toString(activeAccount), Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getApplicationContext(), Boolean.toString(activeAccount), Toast.LENGTH_SHORT).show();
                                 final View v = getLayoutInflater().inflate(R.layout.dialogue_builder, null);
                                 final EditText activationKey = (EditText) v.findViewById(R.id.password_otp);
                                 final AlertDialog.Builder

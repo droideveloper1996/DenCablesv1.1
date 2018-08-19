@@ -68,23 +68,21 @@ public class BlueToothFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (!mService.isBTopen()) {
-            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+        if (mService.isAvailable()) {
+            if (!mService.isBTopen()) {
+                Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+            }
         }
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (mService != null)
-            mService.stop();
-            mService = null;
-    }
+
 
     class ClickEvent implements View.OnClickListener {
         public void onClick(View v) {
             String msg = "";
+            SharedPref sharedPref = new SharedPref(getContext());
+
             switch (v.getId()) {
                 case R.id.btn_test:
                     String lang = getString(R.string.bluetooth_strLang);
@@ -96,10 +94,17 @@ public class BlueToothFragment extends Fragment {
                     if ((lang.compareTo("en")) == 0) {
                         cmd[2] |= 0x10;
                         mService.write(cmd);
-                        mService.sendMessage(formatString("CapiYoo Infotech Pvt Ltd."), "GBK");
+                        mService.sendMessage(formatString(sharedPref.getFirmName()), "GBK");
                         cmd[2] &= 0xEF;
                         mService.write(cmd);
+                        mService.sendMessage(formatString(sharedPref.getFirmAddress1() + " " + sharedPref.getFirmAddress2() + " " + sharedPref.getCity()
+                                ) + '\n' + arrangeEndToEnd("Contact No.", sharedPref.getFirmContact()) + '\n' +
+                                        arrangeEndToEnd("Person", sharedPref.getFirmAuthority())
+                                , "GBK");
 
+                        cmd[2] &= 0xEF;
+                        mService.write(cmd);
+                        //   mService.sendMessage(), "GBK");
 
                         /**
                          * Bill Format
@@ -138,7 +143,7 @@ public class BlueToothFragment extends Fragment {
                                         + "--------------------------------"
                                         + "BillNO:		 234XXXXXX\n"
                                         + "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456 ";
-                        mService.sendMessage(msg, "GBK");
+                        //   mService.sendMessage(msg, "GBK");
                     } else if ((lang.compareTo("ch")) == 0) {
                         cmd[2] |= 0x10;
                         mService.write(cmd);           //±¶¿í¡¢±¶¸ßÄ£Ê½
@@ -278,7 +283,22 @@ public class BlueToothFragment extends Fragment {
             spacedCha += " ";
         }
         spacedCha += str;
-        return spacedCha+'\n';
+        return spacedCha;
 
+    }
+
+    String arrangeEndToEnd(String str, String lead) {
+        String spacedCha = "";
+        String myString = "";
+        int length1 = str.trim().length();
+        int length2 = lead.trim().length();
+        int maxSpaces = 32;
+        int rem1 = maxSpaces - length1;
+        int rem2 = rem1 - length2;
+        for (int i = 0; i < rem2; i++) {
+            myString += " ";
+        }
+        spacedCha = str + myString + lead;
+        return spacedCha;
     }
 }

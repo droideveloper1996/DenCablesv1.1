@@ -13,9 +13,15 @@ public class SharedPref {
     SharedPreferences.Editor editor;
 
     public static final String FIRM_NAME = "firm_name";
-    public static final String FIRM_ADDRESS = "firm_address";
+    public static final String FIRM_ADDRESS1 = "firm_address1";
+    public static final String FIRM_ADDRESS2 = "firm_address2";
+
     public static final String FIRM_AUTHORITY = "firm_authority";
     public static final String FIRM_CONTACT = "firm_contact";
+
+    public static final String STATE = "state";
+    public static final String CITY = "city";
+
 
     public SharedPref(Context context) {
         sharedPreferences = context.getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
@@ -59,19 +65,29 @@ public class SharedPref {
         return sharedPreferences.getString(FIRM_NAME, "null");
     }
 
-    public void putFirmAddress(String str) {
-        editor.putString(FIRM_ADDRESS, str);
+    public void putFirmAddress1(String str) {
+        editor.putString(FIRM_ADDRESS1, str);
         editor.commit();
     }
 
-    String getFirmAddress() {
-        return sharedPreferences.getString(FIRM_ADDRESS, null);
+    public void putFirmAddress2(String str) {
+        editor.putString(FIRM_ADDRESS2, str);
+        editor.commit();
+    }
+
+    String getFirmAddress1() {
+        return sharedPreferences.getString(FIRM_ADDRESS1, null);
+    }
+
+    String getFirmAddress2() {
+        return sharedPreferences.getString(FIRM_ADDRESS2, null);
     }
 
     public void setFirmAuthority(String str) {
         editor.putString(FIRM_AUTHORITY, str);
         editor.commit();
     }
+
 
     String getFirmAuthority() {
         return sharedPreferences.getString(FIRM_AUTHORITY, null);
@@ -85,5 +101,25 @@ public class SharedPref {
     String getFirmContact() {
         return sharedPreferences.getString(FIRM_CONTACT, null);
     }
+
+    public void setState(String state) {
+        editor.putString(STATE, state);
+        editor.commit();
+    }
+
+    String getState() {
+        return sharedPreferences.getString(STATE, "null");
+    }
+
+
+    public void setCity(String state) {
+        editor.putString(CITY, state);
+        editor.commit();
+    }
+
+    String getCity() {
+        return sharedPreferences.getString(CITY, "null");
+    }
+
 
 }
