@@ -1,13 +1,20 @@
 package com.capiyoo.dencables;
 
-import android.location.Address;
-
 public class DenDetails {
 
     private String mMasterStatus;
     private String mLcoCode;
     private String mVCNo;
     private String mSetupBoxNumber;
+    private String mCustomerKey;
+
+    public String getmCustomerKey() {
+        return mCustomerKey;
+    }
+
+    public void setmCustomerKey(String mCustomerKey) {
+        this.mCustomerKey = mCustomerKey;
+    }
 
     private String mBoxStatus;
     private String mRecDate;

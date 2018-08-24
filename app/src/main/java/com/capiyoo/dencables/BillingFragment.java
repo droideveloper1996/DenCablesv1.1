@@ -1,17 +1,22 @@
 package com.capiyoo.dencables;
 
+import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,19 +30,24 @@ import java.util.ArrayList;
 import java.util.Date;
 
 
-public class BillingFragment extends Fragment {
+public class BillingFragment extends Fragment implements SetupBoxRecyclerView.CustomerClickListner {
     long diff = 0l;
     RecyclerView recyclerView;
-    DatabaseReference pendingCustomerList;
-    ArrayList<DenDetails> pendingCollectionInfo;
+    SetupBoxRecyclerView billingRecyclerAdapter;
+    private DatabaseReference pendingCustomerList;
+    private ArrayList<DenDetails> pendingCollectionInfo;
+    private ArrayList<String> CustomerKey;
+    private SearchView searchView;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // long days = getNumberDays("15-AUG-2018");
+        setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.billing_fragment, container, false);
         recyclerView = view.findViewById(R.id.pendingCollection);
         recyclerView.setHasFixedSize(true);
+        CustomerKey = new ArrayList<>();
         SharedPref sharedPref = new SharedPref(getContext());
         pendingCollectionInfo = new ArrayList<>();
         pendingCustomerList = FirebaseDatabase.getInstance().getReference().child(Constants.CUSTOMER_DATA).child(sharedPref.getFirebaseUid());
@@ -75,11 +85,13 @@ public class BillingFragment extends Fragment {
                         String lastPaidDate = denDetails.getmRecDate();
                         int priority = (int) getNumberDays(lastPaidDate);
                         if (priority > 28) {
+                            //  CustomerKey.add(dataSnapshot1.getKey());
+                            denDetails.setmCustomerKey(dataSnapshot1.getKey());
                             pendingCollectionInfo.add(denDetails);
                         }
                     }
 
-                    BillingRecyclerAdapter billingRecyclerAdapter = new BillingRecyclerAdapter(getContext(), pendingCollectionInfo);
+                    billingRecyclerAdapter = new SetupBoxRecyclerView(getContext(), pendingCollectionInfo, CustomerKey, BillingFragment.this);
                     LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
                     recyclerView.setLayoutManager(linearLayoutManager);
                     recyclerView.setAdapter(billingRecyclerAdapter);
@@ -94,49 +106,52 @@ public class BillingFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onCustomerClick(DenDetails denDetails) {
 
-    class BillingRecyclerAdapter extends RecyclerView.Adapter<BillingRecyclerAdapter.BillingRecyclerViewHolder> {
+        Intent intent = new Intent(getContext(), CustomerProfileActivity.class);
+        intent.putExtra("CustomerKey", denDetails.getmCustomerKey());
+        startActivity(intent);
+    }
 
-        Context mCtx;
-        ArrayList<DenDetails> pendingCustomer;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
 
-        public BillingRecyclerAdapter(Context mCtx, ArrayList<DenDetails> denDetails) {
-            this.mCtx = mCtx;
-            this.pendingCustomer = denDetails;
-        }
+        SearchManager searchManager = (SearchManager) getContext().getSystemService(Context.SEARCH_SERVICE);
+        searchView = (SearchView) item.getActionView();
 
-        @Override
-        public BillingRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new BillingRecyclerViewHolder(LayoutInflater.from(mCtx).inflate(R.layout.list_item_view,parent,false));
-        }
+        searchView.setMaxWidth(Integer.MAX_VALUE);
 
-        @Override
-        public void onBindViewHolder(BillingRecyclerViewHolder holder, int position) {
+        // listening to search query text change
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // filter recycler view when query submitted
+                Toast.makeText(getContext(), "Clicked me", Toast.LENGTH_LONG).show();
+                billingRecyclerAdapter.getFilter().filter(query);
+                billingRecyclerAdapter.notifyDataSetChanged();
 
-            holder.boxNumber.setText(pendingCustomer.get(position).getmVCNo());
-            holder.boxStatus.setText(pendingCustomer.get(position).getmBoxStatus());
-            holder.customerName.setText(pendingCustomer.get(position).getmCustomerName());
-            holder.customerCode.setText(pendingCustomer.get(position).getmCCode());
-        }
-
-        @Override
-        public int getItemCount() {
-            return pendingCollectionInfo.size();
-        }
-
-        class BillingRecyclerViewHolder extends RecyclerView.ViewHolder {
-            TextView customerName;
-            TextView boxNumber;
-            TextView boxStatus;
-            TextView customerCode;
-            public BillingRecyclerViewHolder(View itemView) {
-                super(itemView);
-                customerCode = itemView.findViewById(R.id.customerCode);
-                customerName = itemView.findViewById(R.id.customerName);
-                boxStatus = itemView.findViewById(R.id.boxStatus);
-                boxNumber = itemView.findViewById(R.id.boxNumber);
+                return false;
             }
-        }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                // filter recycler view when text is changed
+                //Toast.makeText(getContext(),"Clicked me",Toast.LENGTH_LONG).show();
+
+                billingRecyclerAdapter.getFilter().filter(query);
+                billingRecyclerAdapter.notifyDataSetChanged();
+                return false;
+            }
+        });
+        return true;
+    }
+
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.main_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
 }

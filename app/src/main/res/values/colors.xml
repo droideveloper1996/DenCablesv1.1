@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#b22222</color>
-    <color name="colorPrimaryDark">#b22222</color>
+    <color name="colorPrimary">#c32626</color>
+    <color name="colorPrimaryDark">#c32626</color>
     <color name="colorAccent">#FF4081</color>
     <color name="violet">#FF604590</color>
     <color name="violet_deepen">#FF8766C5</color>

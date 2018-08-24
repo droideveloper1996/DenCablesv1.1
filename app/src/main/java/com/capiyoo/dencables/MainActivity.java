@@ -2,6 +2,7 @@ package com.capiyoo.dencables;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
@@ -11,12 +12,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -26,7 +23,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -35,11 +31,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity {
     ActionBarDrawerToggle actionBarDrawerToggle;
     DrawerLayout drawerLayout;
     TabLayout tabLayout;
@@ -74,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
             if (isFirstTimeRegistration || isActivated) {
                 final View v = getLayoutInflater().inflate(R.layout.dialogue_builder, null);
-                final EditText activationKey = (EditText) v.findViewById(R.id.password_otp);
+                final EditText activationKey = v.findViewById(R.id.password_otp);
                 final AlertDialog.Builder
                         builder = new AlertDialog.Builder(this, R.style.CustomAlertDialog);
                 Button cancelBtn = v.findViewById(R.id.cancel);
@@ -114,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                                  */
                                 //Toast.makeText(getApplicationContext(), Boolean.toString(activeAccount), Toast.LENGTH_SHORT).show();
                                 final View v = getLayoutInflater().inflate(R.layout.dialogue_builder, null);
-                                final EditText activationKey = (EditText) v.findViewById(R.id.password_otp);
+                                final EditText activationKey = v.findViewById(R.id.password_otp);
                                 final AlertDialog.Builder
                                         builder = new AlertDialog.Builder(MainActivity.this, R.style.CustomAlertDialog);
                                 builder.setView(v);
@@ -255,8 +250,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        drawerLayout = findViewById(R.id.drawerLayout);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.True, R.string.False);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
@@ -287,17 +282,40 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.main_menu, menu);
-        MenuItem search = menu.findItem(R.id.search);
-        SearchView searchView = (SearchView) search.getActionView();
+    /* @Override
+     public boolean onCreateOptionsMenu(Menu menu) {
+         MenuInflater menuInflater = getMenuInflater();
+         menuInflater.inflate(R.menu.main_menu, menu);
 
-        searchView.setOnQueryTextListener(this);
-        return super.onCreateOptionsMenu(menu);
-    }
+         MenuItem search = menu.findItem(R.id.search);
+         SearchView searchView = (SearchView) search.getActionView();
+         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+         searchView = (SearchView) menu.findItem(R.id.action_search)
+                 .getActionView();
+         searchView.setSearchableInfo(searchManager
+                 .getSearchableInfo(getComponentName()));
+         searchView.setMaxWidth(Integer.MAX_VALUE);
 
+         // listening to search query text change
+         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+             @Override
+             public boolean onQueryTextSubmit(String query) {
+                 // filter recycler view when query submitted
+                 new SetupBoxRecyclerView().getFilter().filter(query);
+                 return false;
+             }
+
+             @Override
+             public boolean onQueryTextChange(String query) {
+                 // filter recycler view when text is changed
+                 mAdapter.getFilter().filter(query);
+                 return false;
+             }
+         });
+
+         return super.onCreateOptionsMenu(menu);
+     }
+ */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -305,6 +323,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             return true;
 
         int id = item.getItemId();
+        if (id == R.id.action_search) {
+            return true;
+        }
         switch (id) {
             case R.id.action_add_customer:
                 startActivity(new Intent(MainActivity.this, NewCustomerActivity.class));
@@ -315,16 +336,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     }
 
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
 
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        Toast.makeText(getApplicationContext(), "Clicke me", Toast.LENGTH_SHORT).show();
-        return false;
-    }
 
     void getAuthState() {
 

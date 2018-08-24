@@ -13,31 +13,31 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SetupBoxRecyclerView extends RecyclerView.Adapter<SetupBoxRecyclerView.SetupBoxViewHolder> implements Filterable {
+public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.HomeAdapterViewHolder> implements Filterable {
 
-    private Context mCtx;
+    public static HomeCustomerClickListner customerClickListner;
     ArrayList<DenDetails> denDetails;
     ArrayList<String> customerKey;
-    ArrayList<String> filteredCustomerKey;
     ArrayList<DenDetails> customerListFiltered;
-    public static CustomerClickListner customerClickListner;
+    ArrayList<String> filteredCustomerKey;
+    private Context mCtx;
 
-    public SetupBoxRecyclerView(Context mCtx, ArrayList<DenDetails> denDetails, ArrayList<String> customerKey,CustomerClickListner customerClickListner) {
+    public HomeAdapter(Context mCtx, ArrayList<DenDetails> denDetails, ArrayList<String> customerKey, HomeCustomerClickListner customerClickListner) {
         this.mCtx = mCtx;
         this.denDetails = denDetails;
         this.customerKey = customerKey;
         this.customerListFiltered = denDetails;
+        HomeAdapter.customerClickListner = customerClickListner;
         this.filteredCustomerKey = customerKey;
-        SetupBoxRecyclerView.customerClickListner = customerClickListner;
     }
 
     @Override
-    public SetupBoxViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new SetupBoxViewHolder(LayoutInflater.from(mCtx).inflate(R.layout.list_item_view, parent, false));
+    public HomeAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new HomeAdapterViewHolder(LayoutInflater.from(mCtx).inflate(R.layout.list_item_view, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(SetupBoxViewHolder holder, int position) {
+    public void onBindViewHolder(HomeAdapterViewHolder holder, int position) {
         holder.boxNumber.setText(customerListFiltered.get(position).getmVCNo());
         holder.boxStatus.setText(customerListFiltered.get(position).getmBoxStatus());
         holder.customerName.setText(customerListFiltered.get(position).getmCustomerName());
@@ -60,6 +60,7 @@ public class SetupBoxRecyclerView extends RecyclerView.Adapter<SetupBoxRecyclerV
                     customerListFiltered = denDetails;
                 } else {
                     ArrayList<DenDetails> filteredList = new ArrayList<>();
+
                     ArrayList<String> customerKeyFilter = new ArrayList<>();
                     for (DenDetails row : denDetails) {
 
@@ -71,7 +72,7 @@ public class SetupBoxRecyclerView extends RecyclerView.Adapter<SetupBoxRecyclerV
                             customerKeyFilter.add(row.getmCustomerKey());
                         }
                     }
-
+                    //customerListFiltered.clear();
                     customerListFiltered = filteredList;
                     filteredCustomerKey = customerKeyFilter;
                 }
@@ -97,36 +98,36 @@ public class SetupBoxRecyclerView extends RecyclerView.Adapter<SetupBoxRecyclerV
                 //Log.d("Key",filteredCustomerKey.get(0));
 
                 notifyDataSetChanged();
+
             }
         };
     }
 
 
-
-    interface CustomerClickListner {
-        void onCustomerClick(DenDetails denDetails);
+    interface HomeCustomerClickListner {
+        void onCustomerClick(DenDetails position);
     }
 
-    public class SetupBoxViewHolder extends RecyclerView.ViewHolder {
+    public class HomeAdapterViewHolder extends RecyclerView.ViewHolder {
         TextView customerName;
         TextView boxNumber;
         TextView boxStatus;
         TextView customerCode;
 
-        public SetupBoxViewHolder(View itemView) {
+        public HomeAdapterViewHolder(View itemView) {
             super(itemView);
             customerCode = itemView.findViewById(R.id.customerCode);
             customerName = itemView.findViewById(R.id.customerName);
             boxStatus = itemView.findViewById(R.id.boxStatus);
             boxNumber = itemView.findViewById(R.id.boxNumber);
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
+                public void onClick(View view) {
+                    // send selected contact in callback
                     customerClickListner.onCustomerClick(customerListFiltered.get(getAdapterPosition()));
                 }
             });
-
-
 
         }
 

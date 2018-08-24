@@ -8,5 +8,7 @@ public class Constants {
     public static final String REEDEMED_BY="ActivationKey";
     public static final String CUSTOMER_DATA="CustomerData";
 
+    public static final String CUSTOMER_BILLING_INFO = "billing-info";
+
 
 }

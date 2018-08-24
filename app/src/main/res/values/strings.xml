@@ -2,6 +2,7 @@
     <string name="app_name">DenCables</string>
     <string name="True">true</string>
     <string name="False">false</string>
+    <string name="search_hint">Type name…</string>
 
 
     <!-- USB资源 -->
@@ -49,4 +50,5 @@
     <string name="wifi_btn_opencasher">Open Casher</string>
     <string name="wifi_qr_code_Send_string">SDK 2D-Code print test.</string>
     <string name="pending_collection">Pending Collection</string>
+    <string name="total_customer">Total Customer</string>
 </resources>

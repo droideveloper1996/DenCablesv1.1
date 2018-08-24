@@ -43,7 +43,7 @@ public class CustomerProfileActivity extends AppCompatActivity {
     BluetoothService mService = null;
     BluetoothDevice con_dev = null;
     private static final int REQUEST_ENABLE_BT = 2;
-
+    String formattedDate = "";
     private static final int REQUEST_CONNECT_DEVICE = 1;  //Get device message
     FirebaseAuth firebaseAuth;
     FirebaseDatabase firebaseDatabase;
@@ -70,9 +70,11 @@ public class CustomerProfileActivity extends AppCompatActivity {
     TextView customerPreviousBalance;
     float monthlyPakage;
     float outstandingAmt;
+    float previousBalanceCopy;
     String key;
     String customerLastPayDate;
     Button printReciept;
+    Boolean isPreviousBalance = true;
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -134,7 +136,7 @@ public class CustomerProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_customer_profile);
         firebaseAuth = FirebaseAuth.getInstance();
         connectPrinter = findViewById(R.id.actionConnectPrinter);
-        printReciept=findViewById(R.id.actionPrintReciept);
+        printReciept = findViewById(R.id.actionPrintReciept);
         SharedPref sharedPref = new SharedPref(this);
         databaseReference = FirebaseDatabase.getInstance().getReference().child(Constants.CUSTOMER_DATA).child(sharedPref.getFirebaseUid());
         toolbarView = findViewById(R.id.yo_toolbar);
@@ -192,10 +194,35 @@ public class CustomerProfileActivity extends AppCompatActivity {
                                 monthlyPakage = Float.parseFloat(denDetails.getmMonthlyCharge());
                                 float balance = Float.parseFloat(denDetails.getmBalance());
                                 customerLastPayDate = denDetails.getmRecDate();
-                                outstandingAmt = monthlyPakage + balance;
-                                customerPreviousBalance.setText("Previous Balance: " + "₹" + denDetails.getmBalance() + ".00");
+                                if (isPreviousBalance) {
+                                    previousBalanceCopy = balance;
+                                    outstandingAmt = monthlyPakage + previousBalanceCopy;
+
+                                    //Log.i("Old Balance ",Float.toString(previousBalanceCopy));
+                                    //Log.i("New Balance ",Float.toString(previousBalanceCopy));
+                                    //  Log.i("Outstanding Balance ",Float.toString(previousBalanceCopy));
+                                    //   Toast.makeText(getApplicationContext(), Float.toString(previousBalanceCopy), Toast.LENGTH_LONG).show();
+                                    isPreviousBalance = false;
+                                } else {
+                                    outstandingAmt = monthlyPakage + balance;
+
+                                    // Toast.makeText(getApplicationContext(), "Old Balance Amount"+Float.toString(previousBalanceCopy), Toast.LENGTH_LONG).show();
+
+                                    //  Toast.makeText(getApplicationContext(), "Updated Balance: " + Float.toString(balance), Toast.LENGTH_LONG).show();
+                                    //Log.i("Old Balance ",Float.toString(previousBalanceCopy));
+                                    //Log.i("New Balance ",Float.toString(previousBalanceCopy));
+                                    //  Log.i("Outstanding Balance ",Float.toString(previousBalanceCopy));customerPreviousBalance
+
+                                }
+                                customerPreviousBalance.setText("Previous Balance: " + "₹" + denDetails.getmBalance());
                                 customerMonthlyPackage.setText("Monthly Charge : " + "₹" + denDetails.getmMonthlyCharge());
+                                /***
+                                 *
+                                 *                                 Add Next Due Date
+
+                                 */
                                 customerPendingAmount.setText("Outstanding Due: " + "₹" + outstandingAmt);
+
                                 customerLastPaymentDate.setText("Last Paid: " + denDetails.getmRecDate());
                                 customerLastPaymentReciept.setText("Last Receipt No: " + denDetails.getmRecNo());
                                 int noOfdays = (int) getNumberDays(customerLastPayDate);
@@ -221,11 +248,19 @@ public class CustomerProfileActivity extends AppCompatActivity {
             }
         }
         hideKeyboard(this);
+        // TODO:
+        /**
+         *
+         * Make outstanding amount to be 0 or show Next Month
+         */
 
         actionPrintReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 updateBalance();
+                updateBillingReport();
+                updateIndividualCustomerBill();
+
                 //  printReciept.setVisibility(View.VISIBLE);
             }
         });
@@ -261,6 +296,13 @@ public class CustomerProfileActivity extends AppCompatActivity {
                                 ) + '\n' + arrangeEndToEnd("Contact No.", sharedPref.getFirmContact()) + '\n' +
                                         arrangeEndToEnd("Person", sharedPref.getFirmAuthority() + '\n')
                                 , "GBK");
+                        cmd[2] &= 0xEF;
+                        mService.write(cmd);
+                        mService.sendMessage(arrangeEndToEnd("Line Man.", "ANM-"), "GBK");
+
+                        cmd[2] |= 0x10;
+                        mService.write(cmd);
+                        mService.sendMessage(formatString("--------------------------------") + '\n', "GBK");
 
                         cmd[2] |= 0x10;
                         mService.write(cmd);
@@ -268,7 +310,11 @@ public class CustomerProfileActivity extends AppCompatActivity {
 
                         cmd[2] &= 0xEF;
                         mService.write(cmd);
-                        mService.sendMessage(arrangeEndToEnd("INVOICE NO.", "ANM-000001"), "GBK");
+                        mService.sendMessage(arrangeEndToEnd("Invoice No.", "ANM-000001"), "GBK");
+
+                        cmd[2] &= 0xEF;
+                        mService.write(cmd);
+                        mService.sendMessage(arrangeEndToEnd("Invoice Date.", formattedDate), "GBK");
 
                         cmd[2] &= 0xEF;
                         mService.write(cmd);
@@ -278,17 +324,17 @@ public class CustomerProfileActivity extends AppCompatActivity {
                         mService.write(cmd);
                         mService.sendMessage(arrangeEndToEnd("Customer Address", denDetails.getmCustomerAddress()), "GBK");
 
-                        cmd[2] &= 0xEF;
-                        mService.write(cmd);
-                        mService.sendMessage(arrangeEndToEnd("Box Number", denDetails.getmSetupBoxNumber()), "GBK");
-
+//                        cmd[2] &= 0xEF;
+//                        mService.write(cmd);
+//                        mService.sendMessage(arrangeEndToEnd("Box Number", denDetails.getmSetupBoxNumber()), "GBK");
+//cmd
                         cmd[2] &= 0xEF;
                         mService.write(cmd);
                         mService.sendMessage(arrangeEndToEnd("Card Number", denDetails.getmVCNo()), "GBK");
 
                         cmd[2] &= 0xEF;
                         mService.write(cmd);
-                        mService.sendMessage(arrangeEndToEnd("Previous Balance.", denDetails.getmBalance()), "GBK");
+                        mService.sendMessage(arrangeEndToEnd("Previous Balance.", Float.toString(previousBalanceCopy)), "GBK");
 
                         cmd[2] &= 0xEF;
                         mService.write(cmd);
@@ -304,7 +350,7 @@ public class CustomerProfileActivity extends AppCompatActivity {
 
                         cmd[2] |= 0x10;
                         mService.write(cmd);
-                        mService.sendMessage(arrangeEndToEnd("Total Amount", Float.toString(outstandingAmt)), "GBK");
+                        mService.sendMessage(arrangeEndToEnd("Total Amount Due", Float.toString(paidAmount + outstandingAmount)), "GBK");
 
 
                         cmd[2] |= 0x10;
@@ -319,6 +365,9 @@ public class CustomerProfileActivity extends AppCompatActivity {
                         mService.write(cmd);
                         mService.sendMessage(formatString("--------------------------------") + '\n', "GBK");
 
+                        cmd[2] &= 0xEF;
+                        mService.write(cmd);
+                        mService.sendMessage(formatString("Receipt Amount Inclusive of all taxes"), "GBK");
 
                         cmd[2] |= 0x10;
                         mService.write(cmd);
@@ -420,6 +469,7 @@ public class CustomerProfileActivity extends AppCompatActivity {
             paynow.setVisibility(View.GONE);
             //printReciept.setVisibility(View.VISIBLE);
             paidAmount = Float.parseFloat(paynow.getText().toString());
+            //outstandingAmount is the Balance amount after the client has paid ;
             outstandingAmount = outstandingAmt - paidAmount;
             if (outstandingAmount < 0) {
                 outstandingAmount *= -1;
@@ -428,8 +478,8 @@ public class CustomerProfileActivity extends AppCompatActivity {
             System.out.println("Current time => " + c);
 
             SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
-            String formattedDate = df.format(c);
-            Toast.makeText(getApplicationContext(), Float.toString(outstandingAmount) + "     " + formattedDate, Toast.LENGTH_LONG).show();
+            formattedDate = df.format(c);
+            // Toast.makeText(getApplicationContext(), Float.toString(outstandingAmount) + "     " + formattedDate, Toast.LENGTH_LONG).show();
             DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference().child(Constants.CUSTOMER_DATA).child(new SharedPref(CustomerProfileActivity.this).getFirebaseUid());
             databaseReference1.keepSynced(true);
             Map map = new HashMap<>();
@@ -461,7 +511,7 @@ public class CustomerProfileActivity extends AppCompatActivity {
                     printReciept.setVisibility(View.VISIBLE);
                     connectPrinter.setVisibility(View.VISIBLE);
                 }
-            }, 500);
+            }, 100);
 
         } else {
             Toast.makeText(getApplicationContext(), "Invalid Amount", Toast.LENGTH_LONG).show();
@@ -477,7 +527,6 @@ public class CustomerProfileActivity extends AppCompatActivity {
             mService.stop();
         mService = null;
     }
-
 
 
     @Override
@@ -502,7 +551,7 @@ public class CustomerProfileActivity extends AppCompatActivity {
                 }
                 break;
         }
-}
+    }
 
     String formatString(String str) {
 
@@ -535,9 +584,37 @@ public class CustomerProfileActivity extends AppCompatActivity {
         return spacedCha;
     }
 
-    void connectPrinter()
-    {
+    void connectPrinter() {
         Intent serverIntent = new Intent(this, DeviceListActivity.class);      //ÔËÐÐÁíÍâÒ»¸öÀàµÄ»î¶¯
         startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
+    }
+
+    void updateBillingReport() {
+
+        DatabaseReference childBillingreference = FirebaseDatabase.getInstance().getReference().child(Constants.CUSTOMER_BILLING_INFO).child(new SharedPref(getApplicationContext()).getFirebaseUid());
+        CustomerBilling customerBilling = new CustomerBilling();
+        customerBilling.setmBalanceAmount(Float.toString(paidAmount + outstandingAmount));
+        customerBilling.setmCrewName("CREW-NAME");
+        customerBilling.setmPaidAmount(Float.toString(paidAmount));
+        customerBilling.setmTimeStamp(formattedDate);
+        customerBilling.setMupdatedBalance(Float.toString(outstandingAmount));
+        customerBilling.setmRecieptNumber("Random-receipt");
+        childBillingreference.child(key).push().setValue(customerBilling).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+
+    }
+
+
+    void updateIndividualCustomerBill() {
+
     }
 }
