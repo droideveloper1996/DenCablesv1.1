@@ -1,8 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LineManActivity">
+    android:background="#f1f1f1"
+    android:orientation="vertical"
+    tools:context=".Activity.LineManActivity">
 
-</android.support.constraint.ConstraintLayout>
+    <ImageView
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/happy" />
+
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@drawable/edittext_style"
+        android:fontFamily="sans-serif"
+        android:hint="Lineman Username"
+        android:inputType="text"
+        android:lines="1"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/edittext_style"
+        android:fontFamily="sans-serif"
+
+        android:hint="Lineman Password"
+        android:inputType="textPassword"
+        android:lines="1"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/loginLineman"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/circularbtn"
+        android:padding="8dp"
+        android:text="Login"
+        android:textColor="#fff" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom"
+        android:gravity="bottom"
+        android:padding="16dp"
+        android:text="For Lineman Management contact administrator or visit www.capiyoo.ooo"
+        android:textColor="#910135" />
+
+</LinearLayout>

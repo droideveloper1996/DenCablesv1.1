@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DenCables</string>
+    <string name="app_name">Cable Management</string>
     <string name="True">true</string>
     <string name="False">false</string>
     <string name="search_hint">Type name…</string>
@@ -51,4 +51,5 @@
     <string name="wifi_qr_code_Send_string">SDK 2D-Code print test.</string>
     <string name="pending_collection">Pending Collection</string>
     <string name="total_customer">Total Customer</string>
+    <string name="choose_your_plan">Choose Your Plan</string>
 </resources>

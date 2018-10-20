@@ -17,5 +17,25 @@
         android:layout_gravity="center_horizontal|center|center_vertical"
         android:layout_height="50dp" />
 
+    <ImageView
+        android:id="@+id/noCustomerList"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center_horizontal|center|center_vertical"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/noCustomerTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-condensed"
+        android:padding="8dp"
+        android:text="Opps! It seems you have no customer"
+        android:textColor="#252525"
+        android:textSize="20sp"
+        android:visibility="gone" />
+
 
 </LinearLayout>

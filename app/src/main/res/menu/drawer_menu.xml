@@ -2,8 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/action_add_customer"
-        android:title="Add new Customer"
-        />
+        android:title="Add new Customer" />
     <item
         android:id="@+id/action_manage"
         android:title="Manage Customer" />
@@ -11,17 +10,16 @@
     <item
         android:id="@+id/action_print"
         android:title="Generate Invoice" />
-    <item
-        android:id="@+id/action_generate_report"
-        android:title="Generate Report" />
+
     <item
         android:id="@+id/action_lineman"
         android:title="Manage Line Man" />
+
+    <item
+        android:id="@+id/action_make_payment"
+        android:title="Make Payment" />
     <item
         android:id="@+id/action_logout"
-        android:title="Logout"
-        />
-    <item
-        android:id="@+id/action_track"
-        android:title="" />
+        android:title="Logout" />
+
 </menu>
