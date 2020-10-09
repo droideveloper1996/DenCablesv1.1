@@ -1,4 +1,4 @@
-# DenCablesv1.1
+# DenCables v1.1
 This is Cable Billing App That allows you to connect to your Mobile to any Thermal Printer and Print Invoice receipt
 
 I have provided Mobile app for Field worker as well as Web UI for administration
