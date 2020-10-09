@@ -14,3 +14,7 @@ Sends SMS alert to Customer on generation of Invoice(Chargeable
 Link to web ERP - https://dencables.firebaseapp.com
 Test Credentials -Email    --> mail@example.com
                  -Password --> 123456
+
+
+Web Management
+https://github.com/droideveloper1996/DenCablesv1.1/blob/master/Screen%20Shot%202020-10-09%20at%209.50.42%20AM.png
