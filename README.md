@@ -9,3 +9,8 @@ Generate Report
 Keeps Track of Due Payments
 Generates Report Automatically (Daily,Monthly Weekly)
 Sends SMS alert to Customer on generation of Invoice(Chargeable
+
+
+Link to web ERP - https://dencables.firebaseapp.com
+Test Credentials -Email    --> mail@example.com
+                 -Password --> 123456
